@@ -57,8 +57,9 @@ module.exports = function () {
 
 
         /**
-         * Returns a promise that is rejected if the URL cannot be resolved,
-         * or the response is not an HTML document or the HTML document does not
+         * Promise is resolved if the fragment identifier is found.
+         * Promise is rejected if the URL cannot be resolved, the resolved
+         * document is not an HTML document or the HTML document does not
          * have the fragment identifier.
          * 
          * @param {String} subjectUrl
@@ -77,6 +78,20 @@ module.exports = function () {
                     return deadlink.fragmentIdentifierDocument(fragmentIdentifier, document);
                 });
         };
+
+        /**
+         * Promise is resolved if all of the fragment identifiers are found.
+         * Promise is rejected if either of the URLs cannot be resolved, the resolved
+         * document is not an HTML document or the HTML document does not
+         * have the fragment identifier.
+         * Promise is rejected with an array of the URLs that were not resolved.
+         * 
+         * @param {Array} subjectUrls
+         * @returns {Promise}
+         */
+         deadlink.fragmentIdentifierURL = function (subjectUrls) {
+            
+         };
 
         /**
          * 
