@@ -1,155 +1,62 @@
-var Promise = require('promise'),
+var Deadlink = {},
+    Promise = require('bluebird'),
     http = require('http'),
     url = require('url'),
     jsdom = require('jsdom');
 
-module.exports = function () {
-    var Deadlink;
+Deadlink = function () {
+    var deadlink = {},
+        requestedUrls = {};
 
-    Deadlink = function () {
-        var deadlink = {},
-            requestedUrls = {};
-
-        /**
-         * Deadlink.get wrapper with added cache.
-         * 
-         * @param {String} url
-         * @param {Object}
-         */
-        deadlink.get = function (url) {
-            if (requestedUrls[url] === undefined) {
-                requestedUrls[url] = Deadlink.get(url);
-            }
-
-            return requestedUrls[url];
-        };
-
-        /**
-         * Returns a promise that when resolved will equal to the URLs that cannot be resolved.
-         *
-         * @param {Array} urlHaystack
-         * @return {Object}
-         */
-        deadlink.deadURLs = function (urlHaystack) {
-            return new Promise(function (resolve) {
-                var advance,
-                    progress = 0,
-                    deadURLs = [];
-
-                advance = function (deadUrl) {
-                    if (deadUrl) {
-                        deadURLs.push(deadUrl);
-                    }
-
-                    if (++progress == urlHaystack.length) {
-                        resolve(deadURLs);
-                    }
-                };
-
-                urlHaystack.forEach(function (url) {
-                    deadlink.get(url)
-                        .then(advance.bind(null, undefined))
-                        .catch(advance.bind(null, url));
-                });
-            });
-        };
-
-
-
-        /**
-         * Promise is resolved if the fragment identifier is found.
-         * Promise is rejected if the URL cannot be resolved, the resolved
-         * document is not an HTML document or the HTML document does not
-         * have the fragment identifier.
-         * 
-         * @param {String} subjectUrl
-         * @throws {Error} URL does not have a fragment identifier.
-         * @returns {Promise}
-         */
-        deadlink.fragmentIdentifierURL = function (subjectUrl) {
-            var fragmentIdentifier = url.parse(subjectUrl).hash;
-            if (!fragmentIdentifier) {
-                throw new Error('URL does not have a fragment identifier.');
-            }
-            
-            return deadlink
-                .get(subjectUrl)
-                .then(function (document) {
-                    return deadlink.fragmentIdentifierDocument(fragmentIdentifier, document);
-                });
-        };
-
-        /**
-         * Promise is resolved if all of the fragment identifiers are found.
-         * Promise is rejected if either of the URLs cannot be resolved, the resolved
-         * document is not an HTML document or the HTML document does not
-         * have the fragment identifier.
-         * Promise is rejected with an array of the URLs that were not resolved.
-         * 
-         * @param {Array} subjectUrls
-         * @returns {Promise}
-         */
-         deadlink.fragmentIdentifierURL = function (subjectUrls) {
-            
-         };
-
-        /**
-         * 
-         */
-        deadlink.fragmentIdentifierDocument = function (fragmentIdentifier, document) {
-            return new Promise(function (resolve, reject) {
-                jsdom.env({
-                    html: document,
-                    created: function (error) {
-                        if (error) {
-                            throw new Error('Document cannot be created.');
-                        }
-                    },
-                    done: function (error, window) {
-                        var ids;
-
-                        if (error) {
-                            throw new Error('Document cannot be created.');
-                        }
-
-                        ids = []
-                            .slice.apply(window.document.body.getElementsByTagName('*'))
-                            .map(function (node) { return node.id; })
-                            .filter(Boolean);
-
-                        if (ids.indexOf(fragmentIdentifier) !== -1) {
-                            resolve();
-                        } else {
-                            reject();
-                        }
-                    }
-                })
-            });
-        };
-
-        return deadlink;
+    Deadlink.Resolution = function (error, result) {
+        this.error = error;
+        this.result = result;
     };
 
     /**
-     * Returns promise that is rejected if the resource cannot be loaded,
-     * or resolved with the body of the response.
+     * Promise is resolved if the URL is resolved.
+     * Promise is rejected if the status code is 404 or
+     * the content-type is not text.
+     * 
+     * @param {String} subjectURL
+     * @param {Promise}
      */
-    Deadlink.get = function (url) {
-        return new Promise(function (resolve, reject) {
-            http.get(url, function (response) {
-                if (response.statusCode == 404) {
-                    reject('Resource not found.');
-                } else if (response.statusCode == 200) {
-                    response.setEncoding('utf8');
-                    response.on('data', function (data) {
-                        resolve(data);
-                    });
-                } else {
-                    throw new Error('Unspecified.');
-                }
-            }).on('error', reject);
-        });
+    deadlink.resolveURL = function (subjectURL) {
+        // Treat http://foo.com/ and http://foo.com/#resource-identifier
+        // as the same when making a request and looking of the cache.
+        subjectURL = url.parse(subjectURL);
+        delete subjectURL.hash;
+        subjectURL = url.format(subjectURL);
+
+        if (requestedUrls[subjectURL] === undefined) {
+            requestedUrls[subjectURL] = new Promise(function (resolve, reject) {
+                http.get(subjectURL, function (response) {
+                    if (response.statusCode == 404) {
+                        resolve(new Deadlink.Resolution('Resource not found.'));
+                    } else {
+                        response.setEncoding('utf8');
+                        response.on('data', function (data) {
+                            resolve(new Deadlink.Resolution(null, data));
+                        });
+                    }
+                }).on('error', reject);
+            });
+        }
+
+        return requestedUrls[subjectURL];
     };
 
-    return Deadlink;
+    /**
+     * Returns a promise that when resolved will equal to the URLs that cannot be resolved.
+     *
+     * @param {Array} subjectURLs
+     * @return {Object}
+     */
+    deadlink.resolveURLs = function (subjectURLs) {
+        return Promise.all(subjectURLs.map(deadlink.resolveURL));
+    };
+
+    return deadlink;
 };
+
+module.exports = Deadlink;

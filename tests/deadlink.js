@@ -2,93 +2,81 @@ var chai = require('chai'),
     expect = chai.expect,
     chaiAsPromised = require('chai-as-promised');
     nock = require('nock'),
-    sinon = require('sinon');
+    Sinon = require('sinon'),
+    Promise = require('bluebird');
+
+//require('mocha-as-promised')();
 
 chai.use(chaiAsPromised);
 
-describe('Deadlink', function () {
-    var Deadlink;
-    beforeEach(function () {
-        Deadlink = require('../src/deadlink.js')();
-    });
-    describe('.get(url)', function () {
-        it('throws an error if HTTP status code is 404', function () {
-            nock('http://gajus.com').get('/').reply(404);
-            return expect(Deadlink.get('http://gajus.com')).rejectedWith('Resource not found.');
-        });
-        it('returns body if HTTP status code is 200', function () {
-            nock('http://gajus.com').get('/').reply(200, 'OK');
-            return expect(Deadlink.get('http://gajus.com')).eventually.equal('OK');
-        });
-        // @todo File URL
-        // @todo Redirect URL
-    });
-});
-
 describe('deadlink', function () {
     var Deadlink,
-        deadlink;
+        deadlink,
+        sinon;
     beforeEach(function () {
-        Deadlink = require('../src/deadlink.js')();
+        Deadlink = require('../src/deadlink.js');
         deadlink = Deadlink();
+        sinon = Sinon.sandbox.create();
     });
-    describe('.get(url)', function () {
-        it('passes the call to Deadlink.get(url)', function () {
-            var spy = sinon.spy();
-            Deadlink.get = spy;
-            deadlink.get('http://gajus.com');
-            expect(spy.calledWith('http://gajus.com')).to.be.true;
+    afterEach(function () {
+        sinon.restore();
+    });
+    describe('.resolveURL(url)', function () {
+        it('promise is resolved with a Deadlink.Resolution', function () {
+            nock('http://gajus.com').get('/').reply(200, 'OK');
+            return deadlink
+                .resolveURL('http://gajus.com')
+                .then(function (Resolution) {
+                    expect(Resolution).to.instanceof(Deadlink.Resolution);
+                });
         });
-        it('caches multiple requests for the same resource', function () {
-            var spy = sinon.spy();
-            Deadlink.get = function () {
-                spy();
+        describe('Deadlink.Resolution of successful resource resolution', function () {
+            it('has no error', function () {
+                nock('http://gajus.com').get('/').reply(200, 'OK');
+                    return deadlink
+                        .resolveURL('http://gajus.com')
+                        .then(function (Resolution) {
+                            expect(Resolution.error).to.null;
+                        });
+            });
+            it('has body of the resolved resource', function () {
+                nock('http://gajus.com').get('/').reply(200, 'OK');
+                    return deadlink
+                        .resolveURL('http://gajus.com')
+                        .then(function (Resolution) {
+                            expect(Resolution.result).to.equal('OK');
+                        });
+            });
+        });
+        describe('Deadlink.Resolution of unsuccessful resource resolution', function () {
+            it('has error', function () {
+                nock('http://gajus.com').get('/').reply(404);
+                    return deadlink
+                        .resolveURL('http://gajus.com')
+                        .then(function (Resolution) {
+                            expect(Resolution.error).to.equal('Resource not found.');
+                        });
+            });
+        });
+    });
+    describe('.resolveURLs(urls)', function () {
+        it('promise is resolved with a Deadlink.Resolution collection', function () {
+            var spy = sinon.spy(deadlink, 'resolveURL');
 
-                return '';
-            };
-            deadlink.get('http://gajus.com');
-            deadlink.get('http://gajus.com');
-            expect(spy.callCount).to.equal(1);
-        });
-    });
-    describe('.deadURLs(urls)', function () {
-        it('returns dead URLs', function () {
-            var promise;
+            nock('http://gajus.com').get('/found-1').reply(200, 'OK');
+            nock('http://gajus.com').get('/found-2').reply(200, 'OK');
+            nock('http://gajus.com').get('/found-3').reply(200, 'OK');
 
-            nock('http://gajus.com').get('/found').reply(200, 'OK');
-            nock('http://gajus.com').get('/not-found-1').reply(404);
-            nock('http://gajus.com').get('/not-found-2').reply(404);
-
-            promise = deadlink.deadURLs(['http://gajus.com/found', 'http://gajus.com/not-found-1', 'http://gajus.com/not-found-2']);
-            
-            return expect(promise).eventually.deep.equal(['http://gajus.com/not-found-1', 'http://gajus.com/not-found-2']);
-        });
-    });
-    describe('.fragmentIdentifierURL(url)', function () {
-        it('throws an error if URL does not have a fragment identifier', function () {
-            expect(function () {
-                deadlink.fragmentIdentifierURL('http://gajus.com');
-            }).to.throw(Error, 'URL does not have a fragment identifier.');
-        });
-        it('passes the call to deadlink.get()', function () {
-            var spy = sinon.spy(),
-                test = deadlink.get;
-            deadlink.get = function () {
-                spy.apply(this, arguments);
-                return test.apply(this, arguments);
-            };
-            deadlink.fragmentIdentifierURL('http://gajus.com/#foo');
-            expect(spy.calledWith('http://gajus.com/#foo')).to.be.true;
-        });
-    });
-    describe('.fragmentIdentifierDocument(fragmentIdentifier, document)', function () {
-        it('promise is rejected if fragment identifier is not found', function () {
-            var promise = deadlink.fragmentIdentifierDocument('foo', '<div></div>');
-            return expect(promise).rejected;
-        });
-        it('promise is resolves if fragment identifier is found', function () {
-            var promise = deadlink.fragmentIdentifierDocument('foo', '<div id="foo"></div>');
-            return expect(promise).be.fulfilled;
+            return deadlink
+                .resolveURLs(['http://gajus.com/found-1', 'http://gajus.com/found-2', 'http://gajus.com/found-3'])
+                .then(function (Resolutions) {
+                    expect(spy.calledWith('http://gajus.com/found-1')).to.true;
+                    expect(spy.calledWith('http://gajus.com/found-2')).to.true;
+                    expect(spy.calledWith('http://gajus.com/found-3')).to.true;
+                    expect(spy.callCount).to.equal(3);
+                    expect(Resolutions.length).to.equal(3);
+                    expect(Resolutions[0]).to.instanceof(Deadlink.Resolution);
+                });
         });
     });
 });
