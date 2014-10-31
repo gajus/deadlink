@@ -1,5 +1,7 @@
 var Promise = require('promise'),
-    http = require('http');
+    http = require('http'),
+    url = require('url'),
+    jsdom = require('jsdom');
 
 module.exports = function () {
     var Deadlink;
@@ -11,7 +13,8 @@ module.exports = function () {
         /**
          * Deadlink.get wrapper with added cache.
          * 
-         * @see Deadlink.get
+         * @param {String} url
+         * @param {Object}
          */
         deadlink.get = function (url) {
             if (requestedUrls[url] === undefined) {
@@ -22,7 +25,7 @@ module.exports = function () {
         };
 
         /**
-         * Returns URLs that cannot be resolved.
+         * Returns a promise that when resolved will equal to the URLs that cannot be resolved.
          *
          * @param {Array} urlHaystack
          * @return {Object}
@@ -48,6 +51,64 @@ module.exports = function () {
                         .then(advance.bind(null, undefined))
                         .catch(advance.bind(null, url));
                 });
+            });
+        };
+
+
+
+        /**
+         * Returns a promise that is rejected if the URL cannot be resolved,
+         * or the response is not an HTML document or the HTML document does not
+         * have the fragment identifier.
+         * 
+         * @param {String} subjectUrl
+         * @throws {Error} URL does not have a fragment identifier.
+         * @returns {Promise}
+         */
+        deadlink.fragmentIdentifierURL = function (subjectUrl) {
+            var fragmentIdentifier = url.parse(subjectUrl).hash;
+            if (!fragmentIdentifier) {
+                throw new Error('URL does not have a fragment identifier.');
+            }
+            
+            return deadlink
+                .get(subjectUrl)
+                .then(function (document) {
+                    return deadlink.fragmentIdentifierDocument(fragmentIdentifier, document);
+                });
+        };
+
+        /**
+         * 
+         */
+        deadlink.fragmentIdentifierDocument = function (fragmentIdentifier, document) {
+            return new Promise(function (resolve, reject) {
+                jsdom.env({
+                    html: document,
+                    created: function (error) {
+                        if (error) {
+                            throw new Error('Document cannot be created.');
+                        }
+                    },
+                    done: function (error, window) {
+                        var ids;
+
+                        if (error) {
+                            throw new Error('Document cannot be created.');
+                        }
+
+                        ids = []
+                            .slice.apply(window.document.body.getElementsByTagName('*'))
+                            .map(function (node) { return node.id; })
+                            .filter(Boolean);
+
+                        if (ids.indexOf(fragmentIdentifier) !== -1) {
+                            resolve();
+                        } else {
+                            reject();
+                        }
+                    }
+                })
             });
         };
 

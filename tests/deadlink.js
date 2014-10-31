@@ -51,7 +51,7 @@ describe('deadlink', function () {
             expect(spy.callCount).to.equal(1);
         });
     });
-    describe('.deadURLs(url)', function () {
+    describe('.deadURLs(urls)', function () {
         it('returns dead URLs', function () {
             var promise;
 
@@ -62,6 +62,33 @@ describe('deadlink', function () {
             promise = deadlink.deadURLs(['http://gajus.com/found', 'http://gajus.com/not-found-1', 'http://gajus.com/not-found-2']);
             
             return expect(promise).eventually.deep.equal(['http://gajus.com/not-found-1', 'http://gajus.com/not-found-2']);
+        });
+    });
+    describe('.fragmentIdentifierURL(url)', function () {
+        it('throws an error if URL does not have a fragment identifier', function () {
+            expect(function () {
+                deadlink.fragmentIdentifierURL('http://gajus.com');
+            }).to.throw(Error, 'URL does not have a fragment identifier.');
+        });
+        it('passes the call to deadlink.get()', function () {
+            var spy = sinon.spy(),
+                test = deadlink.get;
+            deadlink.get = function () {
+                spy.apply(this, arguments);
+                return test.apply(this, arguments);
+            };
+            deadlink.fragmentIdentifierURL('http://gajus.com/#foo');
+            expect(spy.calledWith('http://gajus.com/#foo')).to.be.true;
+        });
+    });
+    describe('.fragmentIdentifierDocument(fragmentIdentifier, document)', function () {
+        it('promise is rejected if fragment identifier is not found', function () {
+            var promise = deadlink.fragmentIdentifierDocument('foo', '<div></div>');
+            return expect(promise).rejected;
+        });
+        it('promise is resolves if fragment identifier is found', function () {
+            var promise = deadlink.fragmentIdentifierDocument('foo', '<div id="foo"></div>');
+            return expect(promise).be.fulfilled;
         });
     });
 });
