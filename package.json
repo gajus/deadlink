@@ -1,0 +1,37 @@
+{
+  "name": "deadlink",
+  "description": "Find dead URLs and references to fragment identifiers.",
+  "keywords": [
+    "link rot",
+    "dead link"
+  ],
+  "version": "1.0.0",
+  "main": "src/deadlink.js",
+  "author": "Gajus Kuizinas <gk@anuary.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gajus/deadlink"
+  },
+  "license": "BSD-3-Clause",
+  "scrips": {
+    "test": "gulp test"
+  },
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "chai-as-promised": "^4.1.1",
+    "gulp": "^3.8.9",
+    "gulp-clean": "^0.3.1",
+    "gulp-header": "^1.2.2",
+    "gulp-jshint": "^1.8.6",
+    "gulp-mocha": "^1.1.1",
+    "gulp-rename": "^1.2.0",
+    "jshint": "^2.5.8",
+    "jsonfile": "^2.0.0",
+    "mocha": "^2.0.1",
+    "nock": "^0.48.2",
+    "sinon": "^1.11.1"
+  },
+  "dependencies": {
+    "promise": "^6.0.1"
+  }
+}
