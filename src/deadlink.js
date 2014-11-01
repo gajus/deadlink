@@ -53,6 +53,13 @@ Deadlink.FragmentIdentifierDocumentResolution = function (data) {
     });
 };
 
+Deadlink.FragmentIdentifierURLResolution = function (data) {
+    var resolution = this;
+    Object.keys(data).forEach(function (k) {
+        resolution[k] = data[k];
+    });
+};
+
 /**
  * Treat http://foo.com/ and http://foo.com/#resource-identifier
  * as the same when making a request and looking of the cache.
