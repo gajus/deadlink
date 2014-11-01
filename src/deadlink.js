@@ -27,7 +27,7 @@ Deadlink = function () {
     };
 
     /**
-     * Returns a promise that when resolved will equal to the URLs that cannot be resolved.
+     * Instantiate a collection of promises using deadlink.resolveURL.
      *
      * @param {Array} subjectURLs
      * @return {Object}
@@ -93,10 +93,12 @@ Deadlink.resolveURL = function (subjectURL) {
             }
 
             if (respondeContentType.toLowerCase().indexOf('text/html') !== 0) {
-                return resolve(new Deadlink.Resolution({
-                    url: subjectURL,
-                    contentType: respondeContentType
-                }));
+                return resolve(
+                    new Deadlink.Resolution({
+                        url: subjectURL,
+                        contentType: respondeContentType
+                    })
+                );
             }
 
             response.on('data', function (chunk) {
@@ -127,11 +129,13 @@ Deadlink.resolveURL = function (subjectURL) {
             });
 
             response.on('end', function () {
-                resolve(new Deadlink.Resolution({
-                    url: subjectURL,
-                    contentType: respondeContentType,
-                    body: responseData
-                }));
+                resolve(
+                    new Deadlink.Resolution({
+                        url: subjectURL,
+                        contentType: respondeContentType,
+                        body: responseData
+                    })
+                );
             });
         }).on('error', reject);
     });
