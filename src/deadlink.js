@@ -46,6 +46,13 @@ Deadlink.URLResolution = function (data) {
     });
 };
 
+Deadlink.FragmentIdentifierResolution = function (data) {
+    var resolution = this;
+    Object.keys(data).forEach(function (k) {
+        resolution[k] = data[k];
+    });
+};
+
 /**
  * Treat http://foo.com/ and http://foo.com/#resource-identifier
  * as the same when making a request and looking of the cache.
@@ -138,6 +145,38 @@ Deadlink.resolveURL = function (subjectURL) {
                 );
             });
         }).on('error', reject);
+    });
+};
+
+Deadlink.resolveFragmentIdentifierDocument = function (fragmentIdentifier, inputDocument) {
+    return new Promise(function (resolve, reject) {
+        jsdom.env({
+            html: inputDocument,
+            created: function (error) {
+                if (error) {
+                    return reject(new Error('Document cannot be created.'));
+                }
+            },
+            loaded: function (error) {
+                if (error) {
+                    return reject(new Error('Document cannot be loaded.'));
+                }
+            },
+            done: function (error, window) {
+                var ids;
+
+                ids = []
+                    .slice.apply(window.document.body.getElementsByTagName('*'))
+                    .map(function (node) { return node.id; })
+                    .filter(Boolean);
+
+                if (ids.indexOf(fragmentIdentifier) !== -1) {
+                    resolve(new Deadlink.FragmentIdentifierResolution({fragmentIdentifier: fragmentIdentifier}));
+                } else {
+                    resolve(new Deadlink.FragmentIdentifierResolution({fragmentIdentifier: fragmentIdentifier, error: 'Fragment not found in the document.'}));
+                }
+            }
+        });
     });
 };
 
