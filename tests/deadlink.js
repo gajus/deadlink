@@ -134,7 +134,7 @@ describe('Deadlink', function () {
                     expect(FragmentIdentifierDocumentResolution).to.instanceof(Deadlink.FragmentIdentifierDocumentResolution);
                 });
         });
-        /*describe('Deadlink.FragmentIdentifierDocumentResolution', function () {
+        describe('Deadlink.FragmentIdentifierDocumentResolution', function () {
             describe('successful resolution of the fragment identifier', function () {
                 it('has fragmentIdentifier', function () {
                     return Deadlink.resolveFragmentIdentifierDocument('foo', '<div id="foo"></div>')
@@ -151,6 +151,6 @@ describe('Deadlink', function () {
                         });
                 });
             });
-        });*/
+        });
     });
 });
