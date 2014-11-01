@@ -8,7 +8,8 @@ var Deadlink = {},
 
 Deadlink = function () {
     var deadlink = {},
-        requestedUrls = {}; 
+        resolvedURLs = {},
+        resolvedDocuments = {};
 
     /**
      * Memoization of Deadlink.resolveURL.
@@ -19,11 +20,11 @@ Deadlink = function () {
     deadlink.resolveURL = function (subjectURL) {
         subjectURL = Deadlink.normaliseURL(subjectURL);
 
-        if (requestedUrls[subjectURL] === undefined) {
-            requestedUrls[subjectURL] = Deadlink.resolveURL(subjectURL);
+        if (resolvedURLs[subjectURL] === undefined) {
+            resolvedURLs[subjectURL] = Deadlink.resolveURL(subjectURL);
         }
 
-        return requestedUrls[subjectURL];
+        return resolvedURLs[subjectURL];
     };
 
     /**
@@ -36,29 +37,53 @@ Deadlink = function () {
         return Promise.all(subjectURLs.map(deadlink.resolveURL));
     };
 
+    /**
+     * 
+     * @param {String} subjectUrl
+     * @throws {Error} URL does not have a fragment identifier.
+     * @returns {Promise}
+     */
+    deadlink.resolveFragmentIdentifierURL = function () {
+        var fragmentIdentifier = url.parse(subjectUrl).hash;
+            if (!fragmentIdentifier) {
+                throw new Error('URL does not have a fragment identifier.');
+            }
+            fragmentIdentifier = fragmentIdentifier.slice(1);
+            
+            return deadlink
+                .get(subjectUrl)
+                .then(function (document) {
+                    return deadlink.fragmentIdentifierDocument(fragmentIdentifier, document);
+                });
+    }
+
     return deadlink;
 };
 
-Deadlink.URLResolution = function (data) {
+Deadlink.Resolution = function (data) {
     var resolution = this;
     Object.keys(data).forEach(function (k) {
         resolution[k] = data[k];
     });
 };
+
+Deadlink.URLResolution = function () {
+    Deadlink.Resolution.apply(this, arguments);
+};
+
+Deadlink.URLResolution.prototype = Object.create(Deadlink.Resolution.prototype);
 
 Deadlink.FragmentIdentifierDocumentResolution = function (data) {
-    var resolution = this;
-    Object.keys(data).forEach(function (k) {
-        resolution[k] = data[k];
-    });
+    Deadlink.Resolution.apply(this, arguments);
 };
 
+Deadlink.FragmentIdentifierDocumentResolution.prototype = Object.create(Deadlink.Resolution.prototype);
+
 Deadlink.FragmentIdentifierURLResolution = function (data) {
-    var resolution = this;
-    Object.keys(data).forEach(function (k) {
-        resolution[k] = data[k];
-    });
+    Deadlink.Resolution.apply(this, arguments);
 };
+
+Deadlink.FragmentIdentifierURLResolution.prototype = Object.create(Deadlink.Resolution.prototype);
 
 /**
  * Treat http://foo.com/ and http://foo.com/#resource-identifier
