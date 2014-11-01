@@ -39,7 +39,7 @@ Deadlink = function () {
     return deadlink;
 };
 
-Deadlink.Resolution = function (data) {
+Deadlink.URLResolution = function (data) {
     var resolution = this;
     Object.keys(data).forEach(function (k) {
         resolution[k] = data[k];
@@ -62,7 +62,7 @@ Deadlink.normaliseURL = function (subjectURL) {
 /**
  * Interpret HTTP response and respond to promise.
  * 
- * Resolution is an instance of Deadlink.Resolution with
+ * URLResolution is an instance of Deadlink.URLResolution with
  * the following properties:
  * 
  * .error, when status code is >= 400.
@@ -84,7 +84,7 @@ Deadlink.resolveURL = function (subjectURL) {
 
             if (response.statusCode >= 400) {
                 return resolve(
-                    new Deadlink.Resolution({
+                    new Deadlink.URLResolution({
                         error: 'Resource not resolvable.',
                         url: subjectURL,
                         statusCode: response.statusCode
@@ -94,7 +94,7 @@ Deadlink.resolveURL = function (subjectURL) {
 
             if (respondeContentType.toLowerCase().indexOf('text/html') !== 0) {
                 return resolve(
-                    new Deadlink.Resolution({
+                    new Deadlink.URLResolution({
                         url: subjectURL,
                         contentType: respondeContentType
                     })
@@ -109,7 +109,7 @@ Deadlink.resolveURL = function (subjectURL) {
                     request.abort();
 
                     return resolve(
-                        new Deadlink.Resolution({
+                        new Deadlink.URLResolution({
                             error: 'Resource is larger than 100kb.',
                             url: subjectURL
                         })
@@ -130,7 +130,7 @@ Deadlink.resolveURL = function (subjectURL) {
 
             response.on('end', function () {
                 resolve(
-                    new Deadlink.Resolution({
+                    new Deadlink.URLResolution({
                         url: subjectURL,
                         contentType: respondeContentType,
                         body: responseData

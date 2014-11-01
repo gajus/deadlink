@@ -56,15 +56,15 @@ describe('Deadlink', function () {
         Deadlink = requireNew('../src/deadlink.js');
     });
     describe('.resolveURL(url)', function () {
-        it('promise is resolved with a Deadlink.Resolution', function () {
+        it('promise is resolved with a Deadlink.URLResolution', function () {
             nock('http://gajus.com').get('/').reply(200, 'OK', {'content-type': 'text/html'});
             return Deadlink
                 .resolveURL('http://gajus.com')
-                .then(function (Resolution) {
-                    expect(Resolution).to.instanceof(Deadlink.Resolution);
+                .then(function (URLResolution) {
+                    expect(URLResolution).to.instanceof(Deadlink.URLResolution);
                 });
         });
-        describe('Deadlink.Resolution', function () {
+        describe('Deadlink.URLResolution', function () {
             describe('resolution of HTML resource', function () {
                 var promise;
                 beforeEach(function () {
@@ -73,8 +73,8 @@ describe('Deadlink', function () {
                         .resolveURL('http://gajus.com/');
                 });
                 it('has URL and response body', function () {
-                    return promise.then(function (Resolution) {
-                        expect(Resolution).to.deep.equal({url: 'http://gajus.com/', contentType: 'text/html', body: 'OK'});
+                    return promise.then(function (URLResolution) {
+                        expect(URLResolution).to.deep.equal({url: 'http://gajus.com/', contentType: 'text/html', body: 'OK'});
                     });
                 });
             });
@@ -86,8 +86,8 @@ describe('Deadlink', function () {
                         .resolveURL('http://gajus.com/');
                 });
                 it('has URL and content type', function () {
-                    return promise.then(function (Resolution) {
-                        expect(Resolution).to.deep.equal({url: 'http://gajus.com/', contentType: 'application/json'});
+                    return promise.then(function (URLResolution) {
+                        expect(URLResolution).to.deep.equal({url: 'http://gajus.com/', contentType: 'application/json'});
                     });
                 });
             });
@@ -99,8 +99,8 @@ describe('Deadlink', function () {
                         .resolveURL('http://gajus.com/');
                 });
                 it('has URL, error and status code', function () {
-                    return promise.then(function (Resolution) {
-                        expect(Resolution).to.deep.equal({url: 'http://gajus.com/', error: 'Resource not resolvable.', statusCode: 404});
+                    return promise.then(function (URLResolution) {
+                        expect(URLResolution).to.deep.equal({url: 'http://gajus.com/', error: 'Resource not resolvable.', statusCode: 404});
                     });
                 });
             });
@@ -112,8 +112,8 @@ describe('Deadlink', function () {
                         .resolveURL('http://gajus.com/');
                 });
                 it('has URL and error', function () {
-                    return promise.then(function (Resolution) {
-                        expect(Resolution).to.deep.equal({url: 'http://gajus.com/', error: 'Resource is larger than 100kb.'});
+                    return promise.then(function (URLResolution) {
+                        expect(URLResolution).to.deep.equal({url: 'http://gajus.com/', error: 'Resource is larger than 100kb.'});
                     });
                 });
             });
