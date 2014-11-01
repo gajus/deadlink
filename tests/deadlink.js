@@ -119,4 +119,38 @@ describe('Deadlink', function () {
             });
         });
     });
+    describe('.makeDOMFromStringGetIDs(inputDocument)', function () {
+        it('returns IDs from the document', function () {
+            return Deadlink.makeDOMFromStringGetIDs('<div id="foo"></div><div id="bar"></div><div id="baz"></div>')
+                .then(function (ids) {
+                    expect(ids).to.deep.equal(['foo', 'bar', 'baz']);
+                });
+        });
+    });
+    describe('.resolveFragmentIdentifierDocument(fragmentIdentifier, inputDocument)', function () {
+        it('promise is resolved with a Deadlink.fragmentIdentifierDocumentResolution', function () {
+            return Deadlink.resolveFragmentIdentifierDocument('foo', '<div id="foo"></div>')
+                .then(function (FragmentIdentifierDocumentResolution) {
+                    expect(FragmentIdentifierDocumentResolution).to.instanceof(Deadlink.FragmentIdentifierDocumentResolution);
+                });
+        });
+        /*describe('Deadlink.FragmentIdentifierDocumentResolution', function () {
+            describe('successful resolution of the fragment identifier', function () {
+                it('has fragmentIdentifier', function () {
+                    return Deadlink.resolveFragmentIdentifierDocument('foo', '<div id="foo"></div>')
+                        .then(function (FragmentIdentifierDocumentResolution) {
+                            expect(FragmentIdentifierDocumentResolution).to.deep.equal({fragmentIdentifier: 'foo'});
+                        });
+                });
+            });
+            describe('unsuccessful resolution of the fragment identifier', function () {
+                it('has fragmentIdentifier', function () {
+                    return Deadlink.resolveFragmentIdentifierDocument('foo', '<div></div>')
+                        .then(function (FragmentIdentifierDocumentResolution) {
+                            expect(FragmentIdentifierDocumentResolution).to.deep.equal({fragmentIdentifier: 'foo', error: 'Fragment identifier not found in the document.'});
+                        });
+                });
+            });
+        });*/
+    });
 });

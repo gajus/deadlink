@@ -46,7 +46,7 @@ Deadlink.URLResolution = function (data) {
     });
 };
 
-Deadlink.FragmentIdentifierResolution = function (data) {
+Deadlink.FragmentIdentifierDocumentResolution = function (data) {
     var resolution = this;
     Object.keys(data).forEach(function (k) {
         resolution[k] = data[k];
@@ -67,16 +67,7 @@ Deadlink.normaliseURL = function (subjectURL) {
 };
 
 /**
- * Interpret HTTP response and respond to promise.
- * 
- * URLResolution is an instance of Deadlink.URLResolution with
- * the following properties:
- * 
- * .error, when status code is >= 400.
- * .statusCode, when status code is >= 400
- * .url
- * .body, when response is HTML document.
- * .contentType, when response is other than HTML document. 
+ * Makes an HTTP request and responds to the promise.
  * 
  * @param {String} subjectURL
  * @param {Promise}
@@ -148,7 +139,26 @@ Deadlink.resolveURL = function (subjectURL) {
     });
 };
 
+/**
+ * Uses inputDocument string to construct DOM and get list of all IDs in the document.
+ */
 Deadlink.resolveFragmentIdentifierDocument = function (fragmentIdentifier, inputDocument) {
+    return new Promise(function (resolve, reject) {
+        Deadlink.makeDOMFromStringGetIDs(inputDocument)
+            .then(function (ids) {
+                if (ids.indexOf(fragmentIdentifier) !== -1) {
+                    resolve(new Deadlink.FragmentIdentifierDocumentResolution({fragmentIdentifier: fragmentIdentifier}));
+                } else {
+                    resolve(new Deadlink.FragmentIdentifierDocumentResolution({fragmentIdentifier: fragmentIdentifier, error: 'Fragment identifier not found in the document.'}));
+                }
+            });
+    });
+};
+
+/**
+ * Uses inputDocument string to construct DOM and get list of all IDs in the document.
+ */
+Deadlink.makeDOMFromStringGetIDs = function (inputDocument) {
     return new Promise(function (resolve, reject) {
         jsdom.env({
             html: inputDocument,
@@ -170,11 +180,7 @@ Deadlink.resolveFragmentIdentifierDocument = function (fragmentIdentifier, input
                     .map(function (node) { return node.id; })
                     .filter(Boolean);
 
-                if (ids.indexOf(fragmentIdentifier) !== -1) {
-                    resolve(new Deadlink.FragmentIdentifierResolution({fragmentIdentifier: fragmentIdentifier}));
-                } else {
-                    resolve(new Deadlink.FragmentIdentifierResolution({fragmentIdentifier: fragmentIdentifier, error: 'Fragment not found in the document.'}));
-                }
+                resolve(ids);
             }
         });
     });
