@@ -47,10 +47,9 @@ Promise.all(promises).then(function () {
 
 ### Resolving URLs
 
-When resolving for URL, you can either resolve a single URL or a collection of URLs.
+The same as [`deadlink.resolve()`](#resolving-urls-and-fragment-identifiers) but limited to URL resolution.
 
 ```js
-deadlink.resolveURL('http://gajus.com');
 deadlink.resolveURLs([
     'http://gajus.com/foo',
     'http://gajus.com/bar'
@@ -65,10 +64,9 @@ It is rejected if `Content-Type` is `text/html` and content length is larger tha
 
 ### Resolving Fragment Identifiers
 
-The API for resolving fragment identifiers is virtually the same as for the URL.
+The same as [`deadlink.resolve()`](#resolving-urls-and-fragment-identifiers) but limited to Fragment Identifier resolution.
 
 ```js
-deadlink.resolveFragmentIdentifierURL('http://gajus.com/#foo');
 deadlink.resolveFragmentIdentifierURLs([
     'http://gajus.com/#foo',
     'http://gajus.com/#bar'
