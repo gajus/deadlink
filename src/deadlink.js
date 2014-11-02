@@ -60,8 +60,43 @@ Deadlink = function () {
         });
     };
 
-    deadlink.resolveFragmentIdentifierURL = function () {
-
+    deadlink.resolveFragmentIdentifierURL = function (subjectURL) {
+        return new Promise(function (resolve, reject) {
+            var fragmentIdentifier = url.parse(subjectURL).hash;
+        
+            if (!fragmentIdentifier) {
+                reject(new Error('URL does not have a fragment identifier.'));
+            }
+            
+            fragmentIdentifier = fragmentIdentifier.slice(1);
+            
+            deadlink.resolveURL(subjectURL)
+                .then(function (URLResolution) {
+                    if (URLResolution.body) {
+                        deadlink.resolveFragmentIdentifierDocument(fragmentIdentifier, URLResolution.body)
+                            .then(function (FragmentIdentifierDocumentResolution) {
+                                if (!FragmentIdentifierDocumentResolution.error) {
+                                    resolve(new Deadlink.FragmentIdentifierURLResolution({
+                                        fragmentIdentifier: FragmentIdentifierDocumentResolution.fragmentIdentifier,
+                                        url: subjectURL
+                                    }));
+                                } else {
+                                    resolve(new Deadlink.FragmentIdentifierURLResolution({
+                                        fragmentIdentifier: FragmentIdentifierDocumentResolution.fragmentIdentifier,
+                                        url: subjectURL,
+                                        error: FragmentIdentifierDocumentResolution
+                                    }));
+                                }
+                            });
+                    } else {
+                        resolve(new Deadlink.FragmentIdentifierURLResolution({
+                            fragmentIdentifier: fragmentIdentifier,
+                            url: subjectURL,
+                            error: URLResolution
+                        }));
+                    }
+                });
+        });
     };
 
     return deadlink;
