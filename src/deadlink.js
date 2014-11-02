@@ -58,35 +58,14 @@ Deadlink = function () {
                 }
             });
         });
-    }
+    };
+
+    deadlink.resolveFragmentIdentifierURL = function () {
+
+    };
 
     return deadlink;
 };
-
-Deadlink.Resolution = function (data) {
-    var resolution = this;
-    Object.keys(data).forEach(function (k) {
-        resolution[k] = data[k];
-    });
-};
-
-Deadlink.URLResolution = function () {
-    Deadlink.Resolution.apply(this, arguments);
-};
-
-Deadlink.URLResolution.prototype = Object.create(Deadlink.Resolution.prototype);
-
-Deadlink.FragmentIdentifierDocumentResolution = function (data) {
-    Deadlink.Resolution.apply(this, arguments);
-};
-
-Deadlink.FragmentIdentifierDocumentResolution.prototype = Object.create(Deadlink.Resolution.prototype);
-
-Deadlink.FragmentIdentifierURLResolution = function (data) {
-    Deadlink.Resolution.apply(this, arguments);
-};
-
-Deadlink.FragmentIdentifierURLResolution.prototype = Object.create(Deadlink.Resolution.prototype);
 
 /**
  * Treat http://foo.com/ and http://foo.com/#resource-identifier
@@ -179,6 +158,18 @@ Deadlink.resolveURL = function (subjectURL) {
  */
 Deadlink.getDocumentIDs = function (inputDocument) {
     return new Promise(function (resolve, reject) {
+        var getIDs = function (document) {
+            setTimeout(function () {
+                var ids;
+
+                ids = []
+                    .slice.apply(document.body.getElementsByTagName('*'))
+                    .map(function (node) { return node.id; })
+                    .filter(Boolean);
+
+                resolve(ids);
+            }, 10);
+        };
         jsdom.env({
             html: inputDocument,
             created: function (error) {
@@ -192,17 +183,44 @@ Deadlink.getDocumentIDs = function (inputDocument) {
                 }
             },
             done: function (error, window) {
-                var ids;
-
-                ids = []
-                    .slice.apply(window.document.body.getElementsByTagName('*'))
-                    .map(function (node) { return node.id; })
-                    .filter(Boolean);
-
-                resolve(ids);
+                // It might be that the fragment identifier on the page are generated using a script
+                // such as https://github.com/gajus/contents, in which case IDs won't be available until
+                // the document has been loaded and the said script finish processing the document.
+                if (window.document.readyState == 'complete') {
+                    getIDs(window.document);
+                } else {
+                    window.document.addEventListener('DOMContentLoaded', function () {
+                        getIDs(window.document);
+                    });
+                }                
             }
         });
     });
 };
+
+Deadlink.Resolution = function (data) {
+    var resolution = this;
+    Object.keys(data).forEach(function (k) {
+        resolution[k] = data[k];
+    });
+};
+
+Deadlink.URLResolution = function () {
+    Deadlink.Resolution.apply(this, arguments);
+};
+
+Deadlink.URLResolution.prototype = Object.create(Deadlink.Resolution.prototype);
+
+Deadlink.FragmentIdentifierDocumentResolution = function (data) {
+    Deadlink.Resolution.apply(this, arguments);
+};
+
+Deadlink.FragmentIdentifierDocumentResolution.prototype = Object.create(Deadlink.Resolution.prototype);
+
+Deadlink.FragmentIdentifierURLResolution = function (data) {
+    Deadlink.Resolution.apply(this, arguments);
+};
+
+Deadlink.FragmentIdentifierURLResolution.prototype = Object.create(Deadlink.Resolution.prototype);
 
 module.exports = Deadlink;
