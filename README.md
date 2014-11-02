@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/gajus/deadlink.png?branch=master)](https://travis-ci.org/gajus/deadlink)
 [![NPM version](https://badge.fury.io/js/deadlink.svg)](http://badge.fury.io/js/deadlink)
 
-Find dead URLs and references to fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
+Find dead references to URLs and fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
 
 You can use deadlink to inspect URLs to all types of documents (text, image, etc.).
 
