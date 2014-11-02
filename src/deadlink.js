@@ -4,6 +4,7 @@ var Deadlink = {},
     url = require('url'),
     jsdom = require('jsdom'),
     crypto = require('crypto'),
+    URLRegExp = require('url-regexp'),
     mmm = require('mmmagic'),
     Magic = mmm.Magic;
 
@@ -126,6 +127,16 @@ Deadlink = function () {
             }
         });
     };
+
+    /**
+     * Matches URLs in the input document.
+     * 
+     * @param {String} subjectDocument
+     * @param {Array}
+     */
+    deadlink.matchURLs = function (subjectDocument) {
+        return URLRegExp.match(subjectDocument);
+    }
 
     return deadlink;
 };

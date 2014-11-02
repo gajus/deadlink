@@ -87,6 +87,10 @@ All of these objects extend from `Deadlink.Resolution`.
 
 The [test cases](https://github.com/gajus/deadlink/tree/master/tests) explain what properties and when do each of these objects have.
 
+### Matching URLs
+
+`deadlink.matchURLs(inputString)` collects all URLs from a string. This function is a wrapper around [URL RegExp](https://github.com/gajus/url-regexp) `match()`.
+
 ## Download
 
 Download using [NPM](https://www.npmjs.org/):

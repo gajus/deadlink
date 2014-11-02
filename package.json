@@ -31,6 +31,7 @@
   "dependencies": {
     "bluebird": "^2.3.10",
     "jsdom": "^1.1.0",
-    "mmmagic": "^0.3.11"
+    "mmmagic": "^0.3.11",
+    "url-regexp": "^1.0.0"
   }
 }
