@@ -6,7 +6,7 @@
 Find dead URLs and references to fragment identifiers.
 
 ```js
-var deadlink = require('deadlink')().Deadlink;
+var deadlink = require('deadlink').Deadlink;
 
 deadlink.resolveURL('http://gajus.com');
 deadlink.resolveURLs([
