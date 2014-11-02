@@ -3,7 +3,13 @@
 [![Build Status](https://travis-ci.org/gajus/deadlink.png?branch=master)](https://travis-ci.org/gajus/deadlink)
 [![NPM version](https://badge.fury.io/js/deadlink.svg)](http://badge.fury.io/js/deadlink)
 
-Find dead URLs and references to fragment identifiers.
+Find dead URLs and references to fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
+
+You can use deadlink to inspect URLs to all types of documents (text, image, etc.).
+
+Deadlink is using a combination of header inspection, [data inspection](https://github.com/mscdex/mmmagic) and content length inspection to determine if the content exists, when to listen for the response, and when to [bail out](#special-case).
+
+Deadlink is using [jsdom](https://github.com/tmpvar/jsdom) to load the document and execute it. Therefore, resolving fragment identifiers will work even if the element IDs of the resulting document are generated dynamically after `DOMContentLoaded` event.
 
 ## Usage
 
@@ -62,9 +68,7 @@ It is rejected if `Content-Type` is `text/html` and content length is larger tha
 
 ### Resolving Fragment Identifiers
 
-The API for resolving fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document) is virtually the same.
-
-Deadlink is using to [jsdom](https://github.com/tmpvar/jsdom) to load the document and execute it. Therefore, it will work even if the element IDs of the resulting document are generated dynamically after `DOMContentLoaded` event.
+The API for resolving fragment identifiers is virtually the same.
 
 ```js
 deadlink.resolveFragmentIdentifierURL('http://gajus.com/#foo');
