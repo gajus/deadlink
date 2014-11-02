@@ -64,6 +64,8 @@ It is rejected if `Content-Type` is `text/html` and content length is larger tha
 
 The API for resolving fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document) is virtually the same.
 
+Deadlink is using to [jsdom](https://github.com/tmpvar/jsdom) to load the document and execute it. Therefore, it will work even if the element IDs of the resulting document are generated dynamically after `DOMContentLoaded` event.
+
 ```js
 deadlink.resolveFragmentIdentifierURL('http://gajus.com/#foo');
 deadlink.resolveFragmentIdentifierURLs([
