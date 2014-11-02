@@ -29,16 +29,6 @@ Deadlink = function () {
     };
 
     /**
-     * Returns a collection of `resolveURL` promises.
-     *
-     * @param {Array} subjectURLs
-     * @return {Object}
-     */
-    deadlink.resolveURLs = function (subjectURLs) {
-        return subjectURLs.map(deadlink.resolveURL);
-    };
-
-    /**
      * @param {String} fragmentIdentifier Fragment identifier name (without #).
      * @param {String} subjectDocument HTML document.
      */
@@ -65,13 +55,11 @@ Deadlink = function () {
      */
     deadlink.resolveFragmentIdentifierURL = function (subjectURL) {
         return new Promise(function (resolve, reject) {
-            var fragmentIdentifier = url.parse(subjectURL).hash;
-        
-            if (!fragmentIdentifier) {
-                reject(new Error('URL does not have a fragment identifier.'));
-            }
+            var fragmentIdentifier = Deadlink.getFragmentIdentifier(subjectURL);
             
-            fragmentIdentifier = fragmentIdentifier.slice(1);
+            if (!fragmentIdentifier) {
+                return reject(new Error('URL does not have a fragment identifier.'));
+            }
             
             deadlink.resolveURL(subjectURL)
                 .then(function (URLResolution) {
@@ -103,13 +91,40 @@ Deadlink = function () {
     };
 
     /**
+     * Returns a collection of `resolveURL` promises.
+     *
+     * @param {Array} subjectURLs
+     * @return {Array}
+     */
+    deadlink.resolveURLs = function (subjectURLs) {
+        return subjectURLs.map(deadlink.resolveURL);
+    };
+
+    /**
      * Returns a collection of `resolveFragmentIdentifierURL` promises.
      *
      * @param {Array} subjectURLs
-     * @return {Object}
+     * @return {Array}
      */
     deadlink.resolveFragmentIdentifierURLs = function (subjectURLs) {
         return subjectURLs.map(deadlink.resolveFragmentIdentifierURL);
+    };
+
+    /**
+     * This is a convenience wrapper to resolve a collection of URLs,
+     * and resolve the fragment identifier when it is part of the URL in the collection.
+     * 
+     * @param {Array} subjectURLs
+     * @return {Array}
+     */
+    deadlink.resolve = function (subjectURLs) {
+        subjectURLs.map(function (subjectURL) {
+            if (Deadlink.getFragmentIdentifier(subjectURL)) {
+                return deadlink.resolveFragmentIdentifierURL(subjectURL);
+            } else {
+                return deadlink.resolveURL(subjectURL);
+            }
+        });
     };
 
     return deadlink;
@@ -240,6 +255,22 @@ Deadlink.getDocumentIDs = function (subjectDocument) {
             }
         });
     });
+};
+
+/**
+ * Extracts the fragment identifier (hash) from the subjectURL.
+ *
+ * @param {String} subjectURL
+ * @return {String|undefined}
+ */
+Deadlink.getFragmentIdentifier = function (subjectURL) {
+    var fragmentIdentifier = url.parse(subjectURL).hash;
+        
+    if (!fragmentIdentifier) {
+        return undefined;
+    }
+    
+    return fragmentIdentifier.slice(1);
 };
 
 Deadlink.Resolution = function (data) {
