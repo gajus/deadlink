@@ -22,7 +22,7 @@ var Deadlink = require('deadlink'),
 
 ### Resolving URLs and Fragment Identifiers
 
-This is a convenience wrapper to resolve a collection of URLs, including the fragment identifier when it is part of the URL. URL/Fragment Identifier is resolved with a promise that in turn resolves to `Deadlink.Resolution`.
+This is a convenience wrapper to resolve a collection of URLs, including the fragment identifier when it is part of the URL. URL/Fragment Identifier is resolved with a promise that in turn resolves to [`Deadlink.Resolution`](#deadlinkresolution).
 
 ```js
 var promises = deadlink.resolve([
@@ -33,7 +33,7 @@ var promises = deadlink.resolve([
 ]);
 ```
 
-Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) to construct a promise that resolves when all of the promises in the collection are resolved. `Deadlink.Resolution` of a successful resolution does not have an `error` property.
+Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) to construct a promise that resolves when all of the promises in the collection are resolved. [`Deadlink.Resolution`](#deadlinkresolution) of a successful resolution does not have an `error` property.
 
 ```js
 Promise.all(promises).then(function () {
@@ -77,7 +77,7 @@ deadlink.resolveFragmentIdentifierURLs([
 
 ### Deadlink.Resolution
 
-The actual `Resolution` object reflects the type of the resource:
+The resolution object reflects the type of the resource:
 
 ```js
 Deadlink.URLResolution
@@ -85,7 +85,9 @@ Deadlink.FragmentIdentifierDocumentResolution
 Deadlink.FragmentIdentifierURLResolution
 ```
 
-Each of these objects extend from `Deadlink.Resolution`.
+All of these objects extend from `Deadlink.Resolution`.
+
+The [test cases](https://github.com/gajus/deadlink/tree/master/tests) explain what properties and when do each of these objects have.
 
 ## Download
 
