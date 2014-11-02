@@ -29,13 +29,13 @@ Deadlink = function () {
     };
 
     /**
-     * Makes a collection of promises using deadlink.resolveURL.
+     * Returns a collection of `resolveURL` promises.
      *
      * @param {Array} subjectURLs
      * @return {Object}
      */
     deadlink.resolveURLs = function (subjectURLs) {
-        return Promise.all(subjectURLs.map(deadlink.resolveURL));
+        return subjectURLs.map(deadlink.resolveURL);
     };
 
     /**
@@ -103,13 +103,13 @@ Deadlink = function () {
     };
 
     /**
-     * Makes a collection of promises using deadlink.resolveFragmentIdentifierURL.
+     * Returns a collection of `resolveFragmentIdentifierURL` promises.
      *
      * @param {Array} subjectURLs
      * @return {Object}
      */
     deadlink.resolveFragmentIdentifierURLs = function (subjectURLs) {
-        return Promise.all(subjectURLs.map(deadlink.resolveFragmentIdentifierURL));
+        return subjectURLs.map(deadlink.resolveFragmentIdentifierURL);
     };
 
     return deadlink;
@@ -130,6 +130,8 @@ Deadlink.normaliseURL = function (subjectURL) {
 
 /**
  * Makes an HTTP request and responds to the promise.
+ * URL is resolved with a promise that in turn resolves to `Deadlink.URLResolution`.
+ * `Deadlink.URLResolution` of a successful resolution does not have `error` property.
  * 
  * @param {String} subjectURL
  * @param {Promise}

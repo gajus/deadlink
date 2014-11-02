@@ -7,6 +7,10 @@ Find dead URLs and references to fragment identifiers.
 
 ## Usage
 
+This guide explains the most common use case, without going into details about the properties of the intermediate results. Some of these properties are useful for further analyzes, such as content inspection.
+
+Refer to the [test cases](https://github.com/gajus/deadlink/tree/master/tests) for the detail explanation of Deadlink behavior.
+
 ```js
 var deadlink = require('deadlink').Deadlink;
 ```
@@ -19,16 +23,20 @@ URL is resolved with a promise that in turn resolves to `Deadlink.URLResolution`
 var promise = deadlink.resolveURL('http://gajus.com');
 ```
 
-If URL has been resolved, then `Deadlink.URLResolution` will not have `error` property.
+`Deadlink.URLResolution` of a successful resolution does not have `error` property.
 
 ```js
 promise.then(function (URLResolution) {
-    URLResolution.error
+    if (!URLResolution.error) {
+        // OK
+    }
 });
 ```
 
+Resolving multiple URLs returns a collection of `resolveURL` promises.
+
 ```js
-deadlink.resolveURLs([
+var promises = deadlink.resolveURLs([
     'http://gajus.com/foo',
     'http://gajus.com/bar'
 ]);
