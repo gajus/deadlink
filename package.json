@@ -1,6 +1,6 @@
 {
   "name": "deadlink",
-  "description": "Find dead references to URLs and fragment identifiers.",
+  "description": "Find dead URLs and fragment identifiers.",
   "keywords": [
     "link rot",
     "dead link"

@@ -3,9 +3,7 @@
 [![Build Status](https://travis-ci.org/gajus/deadlink.png?branch=master)](https://travis-ci.org/gajus/deadlink)
 [![NPM version](https://badge.fury.io/js/deadlink.svg?cache1)](http://badge.fury.io/js/deadlink)
 
-Find dead references to URLs and fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
-
-You can use deadlink to inspect URLs to all types of documents (text, image, etc.).
+Find dead URLs and fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
 
 Deadlink is using a combination of header inspection, [data inspection](https://github.com/mscdex/mmmagic) and content length inspection to determine if the content exists, when to listen for the response, and when to [bail out](#special-case).
 
@@ -13,7 +11,7 @@ Deadlink is using [jsdom](https://github.com/tmpvar/jsdom) to load the document 
 
 ## Usage
 
-This guide explains the most common use case, without going into details about the properties of the intermediate results. Some of these properties are useful for further analyzes, such as content inspection.
+This guide explains the most common use case, without going into details about the properties of the intermediate results. Some of these properties are useful for further analyzes, such as knowing when to load the document to extract the IDs for fragment identification.
 
 Refer to the [test cases](https://github.com/gajus/deadlink/tree/master/tests) for the detail explanation of Deadlink behavior.
 
@@ -24,7 +22,7 @@ var Deadlink = require('deadlink'),
 
 ### Resolving URLs and Fragment Identifiers
 
-This is a convenience wrapper to resolve a collection of URLs, including the fragment identifier when it is part of the URL in the collection. URL/Fragment Identifier is resolved with a promise that in turn resolves to `Deadlink.Resolution`.
+This is a convenience wrapper to resolve a collection of URLs, including the fragment identifier when it is part of the URL. URL/Fragment Identifier is resolved with a promise that in turn resolves to `Deadlink.Resolution`.
 
 ```js
 var promises = deadlink.resolve([
@@ -35,7 +33,7 @@ var promises = deadlink.resolve([
 ]);
 ```
 
-Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) to construct a promise that resolves when all of the promises in the collection are resolved. `Deadlink.Resolution` of a successful resolution does not have `error` property.
+Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) to construct a promise that resolves when all of the promises in the collection are resolved. `Deadlink.Resolution` of a successful resolution does not have an `error` property.
 
 ```js
 Promise.all(promises).then(function () {
@@ -48,6 +46,8 @@ Promise.all(promises).then(function () {
 ```
 
 ### Resolving URLs
+
+When resolving for URL, you can either resolve a single URL or a collection of URLs.
 
 ```js
 deadlink.resolveURL('http://gajus.com');
@@ -74,6 +74,18 @@ deadlink.resolveFragmentIdentifierURLs([
     'http://gajus.com/#bar'
 ]);
 ```
+
+### Deadlink.Resolution
+
+The actual `Resolution` object reflects the type of the resource:
+
+```js
+Deadlink.URLResolution
+Deadlink.FragmentIdentifierDocumentResolution
+Deadlink.FragmentIdentifierURLResolution
+```
+
+Each of these objects extend from `Deadlink.Resolution`.
 
 ## Download
 
