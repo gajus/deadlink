@@ -213,10 +213,10 @@ describe('Deadlink', function () {
                     });
                 });
             });
-            describe('resolution of HTML resource larger than 1MB', function () {
+            describe('resolution of HTML resource larger than 5MB', function () {
                 var promise;
                 beforeEach(function () {
-                    nock('http://gajus.com').get('/').reply(200, Array(1000 * 1000 + 100).join('X'), {'content-type': 'text/html'});
+                    nock('http://gajus.com').get('/').reply(200, Array(5 * 1000 * 1000 + 100).join('X'), {'content-type': 'text/html'});
                     promise = Deadlink
                         .resolveURL('http://gajus.com/');
                 });

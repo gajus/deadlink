@@ -166,7 +166,7 @@ Deadlink.resolveURL = function (subjectURL) {
             response.on('data', function (chunk) {
                 responseData += chunk;
 
-                if (responseData.length > 1000 * 1000) {
+                if (responseData.length > 5 * 1000 * 1000) {
                     request.abort();
 
                     return reject(new Error('Resource is larger than 1MB.'));

@@ -42,6 +42,20 @@ var promises = deadlink.resolveURLs([
 ]);
 ```
 
+Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) to construct a promise that that resolves when all of the promises in the collection are resolved.
+
+```js
+Promise.all(promises).then(function () {
+    promises.forEach(function (URLResolution) {
+        if (!URLResolution.error) {
+            // OK
+        }
+    });
+});
+```
+
+There is one special case when a valid response can be rejected. The response is rejected if `Content-Type` is `text/html` and content length is larger than 5MB. Deadlink is storing the response of `text/html` in case `resolveFragmentIdentifierURL` will be referring to the said URL in future. If you foresee this as an issue, [raise a ticket](https://github.com/gajus/deadlink/issues). 
+
 ### Resolving Fragment Identifiers
 
 ```js
