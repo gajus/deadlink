@@ -1,7 +1,7 @@
 ## Deadlink
 
 [![Build Status](https://travis-ci.org/gajus/deadlink.png?branch=master)](https://travis-ci.org/gajus/deadlink)
-[![NPM version](https://badge.fury.io/js/deadlink.svg)](http://badge.fury.io/js/deadlink)
+[![NPM version](https://badge.fury.io/js/deadlink.svg?cache1)](http://badge.fury.io/js/deadlink)
 
 Find dead references to URLs and fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
 
