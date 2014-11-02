@@ -3,6 +3,7 @@ var Deadlink = {},
     http = require('http'),
     url = require('url'),
     jsdom = require('jsdom'),
+    crypto = require('crypto'),
     mmm = require('mmmagic'),
     Magic = mmm.Magic;
 
@@ -38,23 +39,25 @@ Deadlink = function () {
     };
 
     /**
-     * 
-     * @param {String} subjectUrl
-     * @throws {Error} URL does not have a fragment identifier.
-     * @returns {Promise}
+     * @param {String} fragmentIdentifier Fragment identifier name (without #).
+     * @param {String} inputDocument HTML document.
      */
-    deadlink.resolveFragmentIdentifierURL = function () {
-        var fragmentIdentifier = url.parse(subjectUrl).hash;
-            if (!fragmentIdentifier) {
-                throw new Error('URL does not have a fragment identifier.');
-            }
-            fragmentIdentifier = fragmentIdentifier.slice(1);
-            
-            return deadlink
-                .get(subjectUrl)
-                .then(function (document) {
-                    return deadlink.fragmentIdentifierDocument(fragmentIdentifier, document);
-                });
+    deadlink.resolveFragmentIdentifierDocument = function (fragmentIdentifier, inputDocument) {
+        var hash = crypto.createHash('md5').update(inputDocument).digest('hex');
+
+        if (resolvedDocuments[hash] === undefined) {
+            resolvedDocuments[hash] = Deadlink.getDocumentIDs(inputDocument);
+        }
+
+        return new Promise(function (resolve, reject) {
+            resolvedDocuments[hash].then(function (ids) {
+                if (ids.indexOf(fragmentIdentifier) !== -1) {
+                    resolve(new Deadlink.FragmentIdentifierDocumentResolution({fragmentIdentifier: fragmentIdentifier}));
+                } else {
+                    resolve(new Deadlink.FragmentIdentifierDocumentResolution({fragmentIdentifier: fragmentIdentifier, error: 'Fragment identifier not found in the document.'}));
+                }
+            });
+        });
     }
 
     return deadlink;
@@ -174,23 +177,7 @@ Deadlink.resolveURL = function (subjectURL) {
 /**
  * Uses inputDocument string to construct DOM and get list of all IDs in the document.
  */
-Deadlink.resolveFragmentIdentifierDocument = function (fragmentIdentifier, inputDocument) {
-    return new Promise(function (resolve, reject) {
-        Deadlink.makeDOMFromStringGetIDs(inputDocument)
-            .then(function (ids) {
-                if (ids.indexOf(fragmentIdentifier) !== -1) {
-                    resolve(new Deadlink.FragmentIdentifierDocumentResolution({fragmentIdentifier: fragmentIdentifier}));
-                } else {
-                    resolve(new Deadlink.FragmentIdentifierDocumentResolution({fragmentIdentifier: fragmentIdentifier, error: 'Fragment identifier not found in the document.'}));
-                }
-            });
-    });
-};
-
-/**
- * Uses inputDocument string to construct DOM and get list of all IDs in the document.
- */
-Deadlink.makeDOMFromStringGetIDs = function (inputDocument) {
+Deadlink.getDocumentIDs = function (inputDocument) {
     return new Promise(function (resolve, reject) {
         jsdom.env({
             html: inputDocument,
