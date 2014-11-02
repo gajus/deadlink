@@ -29,7 +29,7 @@ Deadlink = function () {
     };
 
     /**
-     * Instantiate a collection of promises using deadlink.resolveURL.
+     * Makes a collection of promises using deadlink.resolveURL.
      *
      * @param {Array} subjectURLs
      * @return {Object}
@@ -40,13 +40,13 @@ Deadlink = function () {
 
     /**
      * @param {String} fragmentIdentifier Fragment identifier name (without #).
-     * @param {String} inputDocument HTML document.
+     * @param {String} subjectDocument HTML document.
      */
-    deadlink.resolveFragmentIdentifierDocument = function (fragmentIdentifier, inputDocument) {
-        var hash = crypto.createHash('md5').update(inputDocument).digest('hex');
+    deadlink.resolveFragmentIdentifierDocument = function (fragmentIdentifier, subjectDocument) {
+        var hash = crypto.createHash('md5').update(subjectDocument).digest('hex');
 
         if (resolvedDocuments[hash] === undefined) {
-            resolvedDocuments[hash] = Deadlink.getDocumentIDs(inputDocument);
+            resolvedDocuments[hash] = Deadlink.getDocumentIDs(subjectDocument);
         }
 
         return new Promise(function (resolve, reject) {
@@ -60,6 +60,9 @@ Deadlink = function () {
         });
     };
 
+    /**
+     * @param {String} subjectURL
+     */
     deadlink.resolveFragmentIdentifierURL = function (subjectURL) {
         return new Promise(function (resolve, reject) {
             var fragmentIdentifier = url.parse(subjectURL).hash;
@@ -97,6 +100,16 @@ Deadlink = function () {
                     }
                 });
         });
+    };
+
+    /**
+     * Makes a collection of promises using deadlink.resolveFragmentIdentifierURL.
+     *
+     * @param {Array} subjectURLs
+     * @return {Object}
+     */
+    deadlink.resolveFragmentIdentifierURLs = function (subjectURLs) {
+        return Promise.all(subjectURLs.map(deadlink.resolveFragmentIdentifierURL));
     };
 
     return deadlink;
@@ -189,9 +202,9 @@ Deadlink.resolveURL = function (subjectURL) {
 };
 
 /**
- * Uses inputDocument string to construct DOM and get list of all IDs in the document.
+ * Uses subjectDocument string to construct DOM and get list of all IDs in the document.
  */
-Deadlink.getDocumentIDs = function (inputDocument) {
+Deadlink.getDocumentIDs = function (subjectDocument) {
     return new Promise(function (resolve, reject) {
         var getIDs = function (document) {
             setTimeout(function () {
@@ -206,7 +219,7 @@ Deadlink.getDocumentIDs = function (inputDocument) {
             }, 10);
         };
         jsdom.env({
-            html: inputDocument,
+            html: subjectDocument,
             created: function (error) {
                 if (error) {
                     return reject(new Error('Document cannot be created.'));

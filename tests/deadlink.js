@@ -40,15 +40,6 @@ describe('deadlink', function () {
             expect(spy.callCount).to.equal(1);
         });
     });
-    describe('.resolveURLs()', function () {
-        it('instantiates a collection of promises using deadlink.resolveURL', function () {
-            var spy = sinon.spy(deadlink, 'resolveURL');
-            nock('http://gajus.com').get('/').reply(200, 'OK', {'content-type': 'text/html'});
-            deadlink.resolveURLs(['http://gajus.com/', 'http://gajus.com/', 'http://gajus.com/']);
-            expect(spy.callCount).to.equal(3);
-        });
-    });
-
     describe('.resolveFragmentIdentifierDocument()', function () {
         it('promise is resolved with a Deadlink.fragmentIdentifierDocumentResolution', function () {
             return deadlink.resolveFragmentIdentifierDocument('foo', '<div id="foo"></div>')
