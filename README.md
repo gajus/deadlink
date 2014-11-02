@@ -42,7 +42,7 @@ var promises = deadlink.resolveURLs([
 ]);
 ```
 
-Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) to construct a promise that that resolves when all of the promises in the collection are resolved.
+Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) to construct a promise that resolves when all of the promises in the collection are resolved.
 
 ```js
 Promise.all(promises).then(function () {
@@ -54,9 +54,15 @@ Promise.all(promises).then(function () {
 });
 ```
 
-There is one special case when a valid response can be rejected. The response is rejected if `Content-Type` is `text/html` and content length is larger than 5MB. Deadlink is storing the response of `text/html` in case `resolveFragmentIdentifierURL` will be referring to the said URL in future. If you foresee this as an issue, [raise a ticket](https://github.com/gajus/deadlink/issues). 
+#### Special Case
+
+There is one special case when promise for a valid response can be rejected.
+
+It is rejected if `Content-Type` is `text/html` and content length is larger than 5MB. Deadlink is storing the response of `text/html` in case `resolveFragmentIdentifierURL` will be referring to the said URL in future. If you foresee this as an issue, [raise an issue](https://github.com/gajus/deadlink/issues) stating your use case.
 
 ### Resolving Fragment Identifiers
+
+The API for resolving fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document) is virtually the same.
 
 ```js
 deadlink.resolveFragmentIdentifierURL('http://gajus.com/#foo');
@@ -64,54 +70,6 @@ deadlink.resolveFragmentIdentifierURLs([
     'http://gajus.com/#foo',
     'http://gajus.com/#bar'
 ]);
-```
-
-## BDD
-
-```
-deadlink
-    .resolveURL()
-      ✓ Memoizes Deadlink.resolveURL() function
-    .resolveFragmentIdentifierDocument()
-      ✓ promise is resolved with a Deadlink.fragmentIdentifierDocumentResolution
-      ✓ multiple queries against the same document are cached
-      Deadlink.FragmentIdentifierDocumentResolution
-        successful resolution of the fragment identifier
-          ✓ has fragmentIdentifier
-        unsuccessful resolution of the fragment identifier
-          ✓ has fragmentIdentifier and error
-    .resolveFragmentIdentifierURL()
-      ✓ throws an error if URL does not have a fragment identifier
-      ✓ uses deadlink.resolveURL() to resolve URL
-      ✓ uses deadlink.resolveFragmentIdentifierDocument() to look up the fragment
-      successful resolution
-        ✓ is resolved with Deadlink.FragmentIdentifierURLResolution
-        Deadlink.FragmentIdentifierURLResolution
-          ✓ has fragmentIdentifier and url
-      unsuccessful resolution
-        when resource is not loaded
-          ✓ is resolved with Deadlink.FragmentIdentifierURLResolution
-          Deadlink.FragmentIdentifierURLResolution
-            ✓ has error
-        when fragment is not found
-          ✓ is resolved with Deadlink.FragmentIdentifierURLResolution
-          Deadlink.FragmentIdentifierURLResolution
-            ✓ has error
-
-  Deadlink
-    .resolveURL()
-      ✓ promise is resolved with a Deadlink.URLResolution
-      Deadlink.URLResolution
-        resolution of HTML resource
-          ✓ has URL and response body
-        resolution of resource other than HTML
-          ✓ has URL and content type
-        resolution of status code >=400
-          ✓ has URL, error and status code
-        resolution of HTML resource larger than 1MB
-          ✓ is rejected
-    .getDocumentIDs()
-      ✓ returns IDs from the document
 ```
 
 ## Download
