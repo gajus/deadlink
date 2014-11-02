@@ -164,16 +164,10 @@ Deadlink.resolveURL = function (subjectURL) {
             response.on('data', function (chunk) {
                 responseData += chunk;
 
-                // 100 * 1000 max buffer size, 100kb
-                if (responseData.length > 100 * 1000) {
+                if (responseData.length > 1000 * 1000) {
                     request.abort();
 
-                    return resolve(
-                        new Deadlink.URLResolution({
-                            error: 'Resource is larger than 100kb.',
-                            url: subjectURL
-                        })
-                    );
+                    return reject(new Error('Resource is larger than 1MB.'));
                 }
 
                 magic = new Magic(false, mmm.MAGIC_MIME_TYPE);

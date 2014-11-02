@@ -213,17 +213,15 @@ describe('Deadlink', function () {
                     });
                 });
             });
-            describe('resolution of HTML resource larger than 100kb', function () {
+            describe('resolution of HTML resource larger than 1MB', function () {
                 var promise;
                 beforeEach(function () {
-                    nock('http://gajus.com').get('/').reply(200, Array(100 * 1000 + 100).join('X'), {'content-type': 'text/html'});
+                    nock('http://gajus.com').get('/').reply(200, Array(1000 * 1000 + 100).join('X'), {'content-type': 'text/html'});
                     promise = Deadlink
                         .resolveURL('http://gajus.com/');
                 });
-                it('has URL and error', function () {
-                    return promise.then(function (URLResolution) {
-                        expect(URLResolution).to.deep.equal({url: 'http://gajus.com/', error: 'Resource is larger than 100kb.'});
-                    });
+                it('is rejected', function () {
+                    return expect(promise).rejectedWith(Error, 'Resource is larger than 1MB.');
                 });
             });
         });
