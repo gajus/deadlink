@@ -3,18 +3,8 @@ var chai = require('chai'),
     chaiAsPromised = require('chai-as-promised');
     nock = require('nock'),
     Sinon = require('sinon'),
-    Promise = require('bluebird');
-
-/**
- * @see http://stackoverflow.com/a/11477602/368691
- */
-function requireNew (module) {
-    var modulePath = require.resolve(module);
-    
-    delete require.cache[modulePath];
-
-    return require(modulePath);
-};
+    Promise = require('bluebird'),
+    requireNew = require('require-new');
 
 chai.use(chaiAsPromised);
 
