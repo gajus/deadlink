@@ -119,7 +119,7 @@ Deadlink = function () {
      * @return {Array}
      */
     deadlink.resolve = function (subjectURLs) {
-        subjectURLs.map(function (subjectURL) {
+        return subjectURLs.map(function (subjectURL) {
             if (Deadlink.getFragmentIdentifier(subjectURL)) {
                 return deadlink.resolveFragmentIdentifierURL(subjectURL);
             } else {
