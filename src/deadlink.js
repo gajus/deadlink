@@ -168,7 +168,7 @@ Deadlink.resolveURL = function (subjectURL) {
             var request = this,
                 magic,
                 responseData = '',
-                respondeContentType = response.headers['content-type'];
+                respondeContentType = response.headers['content-type'] || '';
 
             if (response.statusCode >= 400) {
                 return resolve(
