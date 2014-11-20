@@ -1,6 +1,7 @@
 var Deadlink = {},
     Promise = require('bluebird'),
     http = require('http'),
+    https = require('https'),
     url = require('url'),
     jsdom = require('jsdom'),
     crypto = require('crypto'),
@@ -164,7 +165,8 @@ Deadlink.normaliseURL = function (subjectURL) {
  */
 Deadlink.resolveURL = function (subjectURL) {
     return new Promise(function (resolve, reject) {
-        http.get(subjectURL, function (response) {
+        var protocol = subjectURL.indexOf('https://') === 0 ? https : http;
+        protocol.get(subjectURL, function (response) {
             var request = this,
                 magic,
                 responseData = '',

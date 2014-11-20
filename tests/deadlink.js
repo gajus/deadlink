@@ -155,13 +155,25 @@ describe('Deadlink', function () {
         Deadlink = requireNew('../src/deadlink.js');
     });
     describe('.resolveURL()', function () {
-        it('promise is resolved with a Deadlink.URLResolution', function () {
-            nock('http://gajus.com').get('/').reply(200, 'OK', {'content-type': 'text/html'});
-            return Deadlink
-                .resolveURL('http://gajus.com')
-                .then(function (URLResolution) {
-                    expect(URLResolution).to.instanceof(Deadlink.URLResolution);
-                });
+        describe('when http:// URL', function () {
+            it('promise is resolved with a Deadlink.URLResolution', function () {
+                nock('http://gajus.com').get('/').reply(200, 'OK', {'content-type': 'text/html'});
+                return Deadlink
+                    .resolveURL('http://gajus.com')
+                    .then(function (URLResolution) {
+                        expect(URLResolution).to.instanceof(Deadlink.URLResolution);
+                    });
+            });
+        });
+        describe('when https:// URL', function () {
+            it('promise is resolved with a Deadlink.URLResolution', function () {
+                nock('https://gajus.com').get('/').reply(200, 'OK', {'content-type': 'text/html'});
+                return Deadlink
+                    .resolveURL('https://gajus.com')
+                    .then(function (URLResolution) {
+                        expect(URLResolution).to.instanceof(Deadlink.URLResolution);
+                    });
+            });
         });
         describe('Deadlink.URLResolution', function () {
             describe('resolution of HTML resource', function () {
