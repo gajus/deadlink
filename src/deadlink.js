@@ -120,13 +120,26 @@ Deadlink = function () {
      * @return {Array}
      */
     deadlink.resolve = function (subjectURLs) {
-        return subjectURLs.map(function (subjectURL) {
+        var promises = [],
+            normalisedURLs = [];
+
+        subjectURLs.forEach(function (subjectURL) {
+            var normalisedURL;
+
+            normalisedURL = Deadlink.normaliseURL(subjectURL);
+
+            if (normalisedURLs.indexOf(normalisedURL) == -1) {
+                normalisedURLs.push(normalisedURL);
+
+                promises.unshift(deadlink.resolveURL(subjectURL));
+            }
+
             if (Deadlink.getFragmentIdentifier(subjectURL)) {
-                return deadlink.resolveFragmentIdentifierURL(subjectURL);
-            } else {
-                return deadlink.resolveURL(subjectURL);
+                promises.push(deadlink.resolveFragmentIdentifierURL(subjectURL));
             }
         });
+
+        return promises;
     };
 
     /**
