@@ -13,6 +13,19 @@ Deadlink is using a combination of header inspection, [data inspection](https://
 
 Deadlink is using [jsdom](https://github.com/tmpvar/jsdom) to load the document and execute it. Therefore, resolving fragment identifiers will work even if the element IDs of the resulting document are generated dynamically after `DOMContentLoaded` event.
 
+<h2 id="contents">Contents</h2>
+
+* [Deadlink](#deadlink)
+* [Contents](#contents)
+* [Usage](#usage)
+    * [Resolving URLs and Fragment Identifiers](#usage-resolving-urls-and-fragment-identifiers)
+    * [Resolving URLs](#usage-resolving-urls)
+    * [Resolving Fragment Identifiers](#usage-resolving-fragment-identifiers)
+    * [Deadlink.Resolution](#usage-deadlink-resolution)
+    * [Matching URLs](#usage-matching-urls)
+* [Download](#download)
+
+
 <h2 id="usage">Usage</h2>
 
 This guide explains the most common use case, without going into details about the properties of the intermediate results. Some of these properties are useful for further analyzes, such as knowing when to load the document to extract the IDs for fragment identification.

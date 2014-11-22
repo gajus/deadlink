@@ -9,6 +9,10 @@ Deadlink is using a combination of header inspection, [data inspection](https://
 
 Deadlink is using [jsdom](https://github.com/tmpvar/jsdom) to load the document and execute it. Therefore, resolving fragment identifiers will work even if the element IDs of the resulting document are generated dynamically after `DOMContentLoaded` event.
 
+## Contents
+
+{"gitdown": "contents"}
+
 ## Usage
 
 This guide explains the most common use case, without going into details about the properties of the intermediate results. Some of these properties are useful for further analyzes, such as knowing when to load the document to extract the IDs for fragment identification.
