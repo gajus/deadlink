@@ -1,11 +1,7 @@
-<!--
-This file has been generated using GitDown (https://github.com/gajus/gitdown).
-Direct edits to this will be be overwritten. Look for GitDown markup file under ./.gitdown/ path.
--->
-<h2 id="deadlink">Deadlink</h2>
+## Deadlink
 
-[![Travis build status](http://img.shields.io/travis/gajus/deadlink/master.svg?style=flat)](https://travis-ci.org/gajus/deadlink)
-[![NPM version](http://img.shields.io/npm/v/deadlink.svg?style=flat)](https://www.npmjs.org/package/deadlink)
+{"gitdown": "badge", "name": "travis"}
+{"gitdown": "badge", "name": "npm-version"}
 
 Find dead URLs and fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
 
@@ -13,7 +9,7 @@ Deadlink is using a combination of header inspection, [data inspection](https://
 
 Deadlink is using [jsdom](https://github.com/tmpvar/jsdom) to load the document and execute it. Therefore, resolving fragment identifiers will work even if the element IDs of the resulting document are generated dynamically after `DOMContentLoaded` event.
 
-<h2 id="usage">Usage</h2>
+## Usage
 
 This guide explains the most common use case, without going into details about the properties of the intermediate results. Some of these properties are useful for further analyzes, such as knowing when to load the document to extract the IDs for fragment identification.
 
@@ -24,7 +20,7 @@ var Deadlink = require('deadlink'),
     deadlink = Deadlink();
 ```
 
-<h3 id="usage-resolving-urls-and-fragment-identifiers">Resolving URLs and Fragment Identifiers</h3>
+### Resolving URLs and Fragment Identifiers
 
 This is a convenience wrapper to resolve a collection of URLs, including the fragment identifier when it is part of the URL. URL/Fragment Identifier is resolved with a promise that in turn resolves to [`Deadlink.Resolution`](#deadlinkresolution).
 
@@ -49,7 +45,7 @@ Promise.all(promises).then(function () {
 });
 ```
 
-<h3 id="usage-resolving-urls">Resolving URLs</h3>
+### Resolving URLs
 
 The same as [`deadlink.resolve()`](#resolving-urls-and-fragment-identifiers) but limited to URL resolution.
 
@@ -60,13 +56,13 @@ deadlink.resolveURLs([
 ]);
 ```
 
-<h4 id="usage-resolving-urls-special-case">Special Case</h4>
+#### Special Case
 
 There is one special case when promise for a valid response can be rejected.
 
 It is rejected if `Content-Type` is `text/html` and content length is larger than 5MB. Deadlink is storing the response of `text/html` in case `resolveFragmentIdentifierURL` will be referring to the said URL in future. If you foresee this as an issue, [raise an issue](https://github.com/gajus/deadlink/issues) stating your use case.
 
-<h3 id="usage-resolving-fragment-identifiers">Resolving Fragment Identifiers</h3>
+### Resolving Fragment Identifiers
 
 The same as [`deadlink.resolve()`](#resolving-urls-and-fragment-identifiers) but limited to Fragment Identifier resolution.
 
@@ -77,7 +73,7 @@ deadlink.resolveFragmentIdentifierURLs([
 ]);
 ```
 
-<h3 id="usage-deadlink-resolution">Deadlink.Resolution</h3>
+### Deadlink.Resolution
 
 The resolution object reflects the type of the resource:
 
@@ -91,11 +87,11 @@ All of these objects extend from `Deadlink.Resolution`.
 
 The [test cases](https://github.com/gajus/deadlink/tree/master/tests) explain what properties and when do each of these objects have.
 
-<h3 id="usage-matching-urls">Matching URLs</h3>
+### Matching URLs
 
 `deadlink.matchURLs(inputString)` collects all URLs from a string. This function is a wrapper around [URL RegExp](https://github.com/gajus/url-regexp) `match()`.
 
-<h2 id="download">Download</h2>
+## Download
 
 Download using [NPM](https://www.npmjs.org/):
 

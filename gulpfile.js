@@ -1,8 +1,7 @@
 var gulp = require('gulp'),
     mocha = require('gulp-mocha'),
     jshint = require('gulp-jshint'),
-    jsonfile = require('jsonfile'),
-    pkg = jsonfile.readFileSync('package.json');
+    GitDown = require('gitdown');
 
 gulp.task('lint', function () {
     return gulp
@@ -13,12 +12,19 @@ gulp.task('lint', function () {
 
 gulp.task('test', ['lint'], function () {
     return gulp
-        .src('./tests/*.js', {read: false})
+        .src(['./tests/*.js'], {read: false})
         .pipe(mocha());
+});
+
+gulp.task('gitdown', function () {
+    return GitDown
+        .read('.gitdown/README.md')
+        .write('README.md');
 });
 
 gulp.task('watch', function () {
     gulp.watch(['./src/*', './tests/*'], ['default']);
+    gulp.watch(['./.gitdown/*'], ['gitdown']);
 });
 
 gulp.task('default', ['test']);
