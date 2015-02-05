@@ -1,3 +1,7 @@
+'use strict';
+
+/* global Promise: true */
+
 var Deadlink = {},
     Promise = require('bluebird'),
     http = require('http'),
@@ -41,7 +45,7 @@ Deadlink = function () {
             resolvedDocuments[hash] = Deadlink.getDocumentIDs(subjectDocument);
         }
 
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             resolvedDocuments[hash].then(function (ids) {
                 if (ids.indexOf(fragmentIdentifier) !== -1) {
                     resolve(new Deadlink.FragmentIdentifierDocumentResolution({fragmentIdentifier: fragmentIdentifier}));
@@ -56,13 +60,13 @@ Deadlink = function () {
      * @param {String} subjectURL
      */
     deadlink.resolveFragmentIdentifierURL = function (subjectURL) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             var fragmentIdentifier = Deadlink.getFragmentIdentifier(subjectURL);
-            
+
             if (!fragmentIdentifier) {
-                return reject(new Error('URL does not have a fragment identifier.'));
+                throw new Error('URL does not have a fragment identifier.');
             }
-            
+
             deadlink.resolveURL(subjectURL)
                 .then(function (URLResolution) {
                     if (URLResolution.body) {
@@ -115,7 +119,7 @@ Deadlink = function () {
     /**
      * This is a convenience wrapper to resolve a collection of URLs,
      * and resolve the fragment identifier when it is part of the URL in the collection.
-     * 
+     *
      * @param {Array} subjectURLs
      * @return {Array}
      */
@@ -128,7 +132,7 @@ Deadlink = function () {
 
             normalisedURL = Deadlink.normaliseURL(subjectURL);
 
-            if (normalisedURLs.indexOf(normalisedURL) == -1) {
+            if (normalisedURLs.indexOf(normalisedURL) === -1) {
                 normalisedURLs.push(normalisedURL);
 
                 promises.unshift(deadlink.resolveURL(subjectURL));
@@ -144,13 +148,13 @@ Deadlink = function () {
 
     /**
      * Matches URLs in the input document.
-     * 
+     *
      * @param {String} subjectDocument
      * @param {Array}
      */
     deadlink.matchURLs = function (subjectDocument) {
         return URLRegExp.match(subjectDocument);
-    }
+    };
 
     return deadlink;
 };
@@ -172,7 +176,7 @@ Deadlink.normaliseURL = function (subjectURL) {
  * Makes an HTTP request and responds to the promise.
  * URL is resolved with a promise that in turn resolves to `Deadlink.URLResolution`.
  * `Deadlink.URLResolution` of a successful resolution does not have `error` property.
- * 
+ *
  * @param {String} subjectURL
  * @param {Promise}
  */
@@ -217,6 +221,10 @@ Deadlink.resolveURL = function (subjectURL) {
 
                 // Make sure that what we are reading is HTML data.
                 magic.detect(chunk, function (err, result) {
+                    if (err) {
+                        throw new Error('Resource type evaluation error.');
+                    }
+
                     if (result.toLowerCase().indexOf('text/') !== 0) {
                         request.abort();
 
@@ -249,7 +257,9 @@ Deadlink.getDocumentIDs = function (subjectDocument) {
 
                 ids = []
                     .slice.apply(document.body.getElementsByTagName('*'))
-                    .map(function (node) { return node.id; })
+                    .map(function (node) {
+                        return node.id;
+                    })
                     .filter(Boolean);
 
                 resolve(ids);
@@ -271,13 +281,13 @@ Deadlink.getDocumentIDs = function (subjectDocument) {
                 // It might be that the fragment identifier on the page are generated using a script
                 // such as https://github.com/gajus/contents, in which case IDs won't be available until
                 // the document has been loaded and the said script finish processing the document.
-                if (window.document.readyState == 'complete') {
+                if (window.document.readyState === 'complete') {
                     getIDs(window.document);
                 } else {
                     window.document.addEventListener('DOMContentLoaded', function () {
                         getIDs(window.document);
                     });
-                }                
+                }
             }
         });
     });
@@ -291,11 +301,11 @@ Deadlink.getDocumentIDs = function (subjectDocument) {
  */
 Deadlink.getFragmentIdentifier = function (subjectURL) {
     var fragmentIdentifier = url.parse(subjectURL).hash;
-        
+
     if (!fragmentIdentifier) {
         return undefined;
     }
-    
+
     return fragmentIdentifier.slice(1);
 };
 
@@ -312,13 +322,13 @@ Deadlink.URLResolution = function () {
 
 Deadlink.URLResolution.prototype = Object.create(Deadlink.Resolution.prototype);
 
-Deadlink.FragmentIdentifierDocumentResolution = function (data) {
+Deadlink.FragmentIdentifierDocumentResolution = function () {
     Deadlink.Resolution.apply(this, arguments);
 };
 
 Deadlink.FragmentIdentifierDocumentResolution.prototype = Object.create(Deadlink.Resolution.prototype);
 
-Deadlink.FragmentIdentifierURLResolution = function (data) {
+Deadlink.FragmentIdentifierURLResolution = function () {
     Deadlink.Resolution.apply(this, arguments);
 };
 

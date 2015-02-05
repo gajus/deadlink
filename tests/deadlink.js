@@ -1,9 +1,10 @@
+'use strict';
+
 var chai = require('chai'),
     expect = chai.expect,
-    chaiAsPromised = require('chai-as-promised');
+    chaiAsPromised = require('chai-as-promised'),
     nock = require('nock'),
     Sinon = require('sinon'),
-    Promise = require('bluebird'),
     requireNew = require('require-new');
 
 chai.use(chaiAsPromised);
@@ -73,13 +74,13 @@ describe('deadlink', function () {
             var spy = sinon.spy(deadlink, 'resolveURL');
             nock('http://gajus.com').get('/').reply(200, '<div id="foo"></div>', {'content-type': 'text/html'});
             deadlink.resolveFragmentIdentifierURL('http://gajus.com/#foo');
-            expect(spy.calledWith('http://gajus.com/#foo')).to.true;
+            expect(spy.calledWith('http://gajus.com/#foo')).to.equal(true);
         });
         it('uses deadlink.resolveFragmentIdentifierDocument() to look up the fragment', function () {
             var spy = sinon.spy(deadlink, 'resolveURL');
             nock('http://gajus.com').get('/').reply(200, '<div id="foo"></div>', {'content-type': 'text/html'});
             deadlink.resolveFragmentIdentifierURL('http://gajus.com/#foo');
-            expect(spy.calledWith('http://gajus.com/#foo')).to.true;
+            expect(spy.calledWith('http://gajus.com/#foo')).to.equal(true);
         });
         describe('successful resolution', function () {
             var promise;
