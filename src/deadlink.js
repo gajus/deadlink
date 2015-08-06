@@ -9,9 +9,10 @@ var Deadlink = {},
     url = require('url'),
     jsdom = require('jsdom'),
     crypto = require('crypto'),
-    URLRegExp = require('url-regexp'),
-    mmm = require('mmmagic'),
-    Magic = mmm.Magic;
+    URLRegExp = require('url-regexp');
+    // mmmagic does not work in iojs 3.0.0
+    // mmm = require('mmmagic'),
+    // Magic = mmm.Magic;
 
 Deadlink = function () {
     var deadlink = {},
@@ -217,7 +218,7 @@ Deadlink.resolveURL = function (subjectURL) {
                     return reject(new Error('Resource is larger than 1MB.'));
                 }
 
-                magic = new Magic(false, mmm.MAGIC_MIME_TYPE);
+                /* magic = new Magic(false, mmm.MAGIC_MIME_TYPE);
 
                 // Make sure that what we are reading is HTML data.
                 magic.detect(chunk, function (err, result) {
@@ -230,7 +231,7 @@ Deadlink.resolveURL = function (subjectURL) {
 
                         return reject(new Error('Resource is not text.'));
                     }
-                });
+                }); */
             });
 
             response.on('end', function () {
