@@ -5,7 +5,7 @@
 
 Find dead URLs and fragment identifiers (URLs with a hash and a corresponding ID element in the resulting document).
 
-Deadlink is using a combination of header inspection, [data inspection](https://github.com/mscdex/mmmagic) and content length inspection to determine if the content exists, when to listen for the response, and when to [bail out](#special-case).
+Deadlink is using a combination of header inspection, [data inspection](https://github.com/mscdex/mmmagic) (2015-08-06: mmmagic has been temporary removed until issues with iojs 3.0.0 are resolved) and content length inspection to determine if the content exists, when to listen for the response, and when to [bail out](#special-case).
 
 Deadlink is using [jsdom](https://github.com/tmpvar/jsdom) to load the document and execute it. Therefore, resolving fragment identifiers will work even if the element IDs of the resulting document are generated dynamically after `DOMContentLoaded` event.
 
